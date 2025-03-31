@@ -29,7 +29,7 @@ dependency "vpc" {
 # Exemplo de inputs (ajuste conforme sua necessidade):
 inputs = {
   region                 = include.locals.region
-  project_id             = include.locals.region
+  project_id             = include.locals.project_id
   mig_self_link          = dependency.compute_engine.outputs.mig_self_link
   health_check_self_link = dependency.compute_engine.outputs.health_check_self_link
   ssl_domains            = ["galileostdio.com"]

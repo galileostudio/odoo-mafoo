@@ -44,7 +44,7 @@ dependency "cloud_sql" {
 
 inputs = {
   region                  = include.locals.region
-  project_id              = include.locals.region
+  project_id              = include.locals.project_id
   custom_image            = "projects/paycon-454222/global/images/odoo-17-custom-image"
   service_account_email   = "the-ring@paycon-454222.iam.gserviceaccount.com"
   subnet_self_link        = dependency.vpc.outputs.subnet_self_link

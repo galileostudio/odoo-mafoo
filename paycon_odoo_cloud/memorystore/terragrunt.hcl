@@ -17,6 +17,6 @@ dependency "vpc" {
 # Exemplo de inputs (ajuste conforme sua necessidade):
 inputs = {
   region          = include.locals.region
-  project_id      = include.locals.region
+  project_id      = include.locals.project_id
   vpc_self_link   = dependency.vpc.outputs.vpc_self_link
 }

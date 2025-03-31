@@ -9,12 +9,12 @@ variable "region" {
 
 variable "vpc_name" {
   type    = string
-  default = "prod-vpc"
+  default = "paycon-vpc"
 }
 
 variable "subnet_name" {
   type    = string
-  default = "prod-subnet"
+  default = "paycon-subnet"
 }
 
 variable "subnet_cidr" {

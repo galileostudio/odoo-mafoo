@@ -10,6 +10,6 @@ terraform {
 
 inputs = {
   region      = include.locals.region
-  project_id  = include.locals.region
+  project_id  = include.locals.project_id
   bucket_name = "paycon_plugins"
 }

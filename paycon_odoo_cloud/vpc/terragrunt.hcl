@@ -10,8 +10,8 @@ terraform {
 inputs = {
   region      = include.locals.region
   project_id  = include.locals.project_id
-  vpc_name    = "prod-vpc"
-  subnet_name = "prod-subnet"
+  vpc_name    = "paycon-vpc"
+  subnet_name = "paycon-subnet"
   subnet_cidr = "10.0.0.0/24"
 
 }
