@@ -58,3 +58,12 @@ output "private_ip" {
     ][0] : null
   )
 }
+
+output "db_username" {
+  value = var.db_username
+}
+
+output "db_password" {
+  value = var.db_password
+  sensitive = true
+}

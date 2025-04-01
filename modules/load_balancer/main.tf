@@ -76,3 +76,7 @@ resource "google_compute_global_forwarding_rule" "odoo_forwarding_rule_http" {
 output "lb_ip_address" {
   value = google_compute_global_forwarding_rule.odoo_forwarding_rule.ip_address
 }
+
+output "health_check_self_link" {
+  value = google_compute_health_check.odoo_hc.self_link
+}

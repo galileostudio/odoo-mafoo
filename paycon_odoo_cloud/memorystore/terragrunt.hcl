@@ -14,6 +14,8 @@ dependency "vpc" {
     vpc_self_link = "projects/mock-project/global/networks/mock-vpc"
   }
 }
+
+
 # Exemplo de inputs (ajuste conforme sua necessidade):
 inputs = {
   region          = include.locals.region

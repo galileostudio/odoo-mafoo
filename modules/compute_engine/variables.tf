@@ -9,12 +9,7 @@ variable "region" {
 
 variable "machine_type" {
   type    = string
-  default = "e2-medium"
-}
-
-variable "custom_image" {
-  type = string
-  # Exemplo: "projects/meu-projeto-gcp/global/images/odoo-17-custom-image"
+  default = "n2-standard-2"
 }
 
 variable "service_account_email" {
@@ -27,6 +22,11 @@ variable "subnet_self_link" {
 
 variable "health_check_self_link" {
   type = string
+}
+
+variable "disk_type" {
+  type    = string
+  default = "pd-ssd"
 }
 
 variable "initial_size" {
@@ -49,16 +49,37 @@ variable "cpu_target" {
   default = 0.75
 }
 
-# Novas variáveis para os buckets
-variable "plugins_bucket_name" {
-  type = string
+variable "disk_size_gb" {
+  type    = number
+  default = 20
 }
 
 variable "attachments_bucket_name" {
-  type = string
+  type        = string
+  description = "Nome do bucket para attachments"
+}
+
+variable "plugins_bucket_name" {
+  type        = string
+  description = "Nome do bucket para plugins"
 }
 
 variable "db_host" {
   description = "IP privado do Cloud SQL"
   type        = string
+}
+
+variable "db_username" {
+  type        = string
+  description = "Database username for Odoo."
+}
+
+variable "db_password" {
+  type        = string
+  description = "Database password for Odoo."
+}
+
+variable "zone" {
+  type    = string
+  default = "southamerica-east1-a"
 }

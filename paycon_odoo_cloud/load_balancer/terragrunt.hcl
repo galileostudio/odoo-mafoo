@@ -8,6 +8,20 @@ terraform {
   source = "../../modules/load_balancer"
 }
 
+dependency "vpc" {
+  config_path = "../vpc"
+  mock_outputs = {
+    subnet_self_link = "mock-subnet-self-link"
+  }
+}
+
+dependency "health_checks" {
+  config_path = "../health_checks"
+  mock_outputs = {
+    health_check_self_link = "mock-health-check"
+  }
+}
+
 dependency "compute_engine" {
   config_path = "../compute_engine"
 
@@ -18,20 +32,12 @@ dependency "compute_engine" {
   }
 }
 
-
-dependency "vpc" {
-  config_path = "../vpc"
-  mock_outputs = {
-    subnet_self_link = "mock-subnet-self-link"
-  }
-}
-
 # Exemplo de inputs (ajuste conforme sua necessidade):
 inputs = {
   region                 = include.locals.region
   project_id             = include.locals.project_id
   mig_self_link          = dependency.compute_engine.outputs.mig_self_link
-  health_check_self_link = dependency.compute_engine.outputs.health_check_self_link
+  health_check_self_link = dependency.health_checks.outputs.health_check_self_link
   ssl_domains            = ["galileostdio.com"]
   enable_cdn             = false
 }
