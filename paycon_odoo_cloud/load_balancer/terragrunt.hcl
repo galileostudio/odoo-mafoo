@@ -40,4 +40,5 @@ inputs = {
   health_check_self_link = dependency.health_checks.outputs.health_check_self_link
   ssl_domains            = ["galileostdio.com"]
   enable_cdn             = false
+  
 }

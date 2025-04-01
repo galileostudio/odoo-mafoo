@@ -6,13 +6,19 @@ resource "random_password" "odoo_admin" {
   special = true
 }
 
+data "google_compute_image" "ubuntu_2404" {
+  project = "ubuntu-os-cloud"
+  family  = "ubuntu-minimal-2404-lts-amd64"
+    
+}
+
 resource "google_compute_instance_template" "odoo_prod_template" {
   name_prefix  = "odoo-prod-template-"
   machine_type = var.machine_type
   region       = var.region
   
   disk {
-    source_image = "projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20240510"
+    source_image = data.google_compute_image.ubuntu_2404.self_link 
     disk_type    = var.disk_type
     disk_size_gb = var.disk_size_gb
     auto_delete  = true
@@ -176,7 +182,7 @@ resource "google_compute_instance_group_manager" "odoo_prod_mig" {
   }
 
   auto_healing_policies {
-    health_check      = google_compute_health_check.odoo_health_check.self_link
+    health_check      = var.health_check_self_link
     initial_delay_sec = 300
   }
 }
@@ -210,8 +216,4 @@ output "instance_template_self_link" {
 
 output "mig_self_link" {
   value = google_compute_instance_group_manager.odoo_prod_mig.self_link
-}
-
-output "health_check_self_link" {
-  value = google_compute_health_check.odoo_health_check.self_link
 }

@@ -2,31 +2,17 @@ terraform {
   backend "gcs" {}
 }
 
-resource "google_compute_health_check" "odoo_hc" {
-  name                = "odoo-health-check"
-  project             = var.project_id
-  check_interval_sec  = 5
-  timeout_sec         = 5
-  healthy_threshold   = 2
-  unhealthy_threshold = 2
-
-  http_health_check {
-    request_path = "/web"
-    port         = 8069
-  }
-}
-
 resource "google_compute_backend_service" "odoo_backend" {
   name                    = "odoo-backend-service"
   project                 = var.project_id
   protocol                = "HTTP"
-  health_checks           = [google_compute_health_check.odoo_hc.self_link]
+  health_checks           = [var.health_check_self_link]
   timeout_sec             = 30
   connection_draining_timeout_sec = 10
   enable_cdn              = var.enable_cdn
 
   backend {
-    group = var.mig_self_link
+    group = replace(var.mig_self_link, "instanceGroupManagers", "instanceGroups")
   }
 }
 
@@ -47,6 +33,10 @@ resource "google_compute_managed_ssl_certificate" "odoo_cert" {
     domains = var.ssl_domains
   }
   project = var.project_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "google_compute_global_forwarding_rule" "odoo_forwarding_rule" {
@@ -77,6 +67,3 @@ output "lb_ip_address" {
   value = google_compute_global_forwarding_rule.odoo_forwarding_rule.ip_address
 }
 
-output "health_check_self_link" {
-  value = google_compute_health_check.odoo_hc.self_link
-}

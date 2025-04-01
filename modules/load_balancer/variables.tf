@@ -20,3 +20,7 @@ variable "ssl_domains" {
   default = ["exemplo.com"]
 }
 
+variable "health_check_self_link" {
+  type        = string
+  description = "Self link do health check criado no módulo health_checks"
+}
