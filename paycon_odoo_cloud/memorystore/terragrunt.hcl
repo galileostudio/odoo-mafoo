@@ -11,12 +11,11 @@ dependency "vpc" {
   config_path = "../vpc"
 
   mock_outputs = {
-    vpc_self_link = "projects/mock-project/global/networks/mock-vpc"
+    vpc_self_link = "projects/paycon-454222/global/networks/paycon-vpc"
   }
 }
 
 
-# Exemplo de inputs (ajuste conforme sua necessidade):
 inputs = {
   region          = include.locals.region
   project_id      = include.locals.project_id

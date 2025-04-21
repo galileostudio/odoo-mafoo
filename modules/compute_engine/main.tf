@@ -44,9 +44,11 @@ resource "google_compute_instance_template" "odoo_prod_template" {
       apt-get upgrade -y
 
       # ========== INSTALA GCSFUSE ==========
+      
       export GCSFUSE_REPO=gcsfuse-$(lsb_release -c -s)
       echo "deb https://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
       curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      apt-get update -y
       apt-get install -y gcsfuse
 
       # ========== PREPARA DIRETÓRIOS ==========
@@ -181,7 +183,7 @@ resource "google_compute_instance_group_manager" "odoo_prod_mig" {
   }
 
   named_port {
-    name = "odoo-http"
+    name = "http"
     port = 8069
   }
 
@@ -189,12 +191,22 @@ resource "google_compute_instance_group_manager" "odoo_prod_mig" {
     health_check      = var.health_check_self_link
     initial_delay_sec = 300
   }
+
+  distribution_policy {
+     # lista de zonas dentro da mesma região
+    zones = [
+      "${var.region}-a",
+      "${var.region}-b",
+      "${var.region}-c",
+    ]
+  }
+  
 }
 
-resource "google_compute_autoscaler" "odoo_prod_autoscaler" {
+resource "google_compute_region_autoscaler" "odoo_prod_rascaler" {
   name   = "odoo-prod-autoscaler"
-  target = google_compute_instance_group_manager.odoo_prod_mig.self_link
-  zone   = data.google_compute_zones.available.names[0]
+  region = var.region
+  target = google_compute_region_instance_group_manager.odoo_prod_rmig.self_link
 
   autoscaling_policy {
     max_replicas    = var.max_size
@@ -204,7 +216,6 @@ resource "google_compute_autoscaler" "odoo_prod_autoscaler" {
     cpu_utilization {
       target = var.cpu_target
     }
-
     scale_in_control {
       max_scaled_in_replicas {
         fixed = 1
@@ -213,6 +224,7 @@ resource "google_compute_autoscaler" "odoo_prod_autoscaler" {
     }
   }
 }
+
 
 output "instance_template_self_link" {
   value = google_compute_instance_template.odoo_prod_template.self_link

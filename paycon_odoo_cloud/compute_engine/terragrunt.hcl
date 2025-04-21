@@ -85,5 +85,6 @@ inputs = {
   disk_size_gb            = 20
   disk_type               = "pd-ssd"
   health_check_self_link = dependency.health_checks.outputs.health_check_self_link
+  
 
 }
