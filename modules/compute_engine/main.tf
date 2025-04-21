@@ -11,7 +11,11 @@ data "google_compute_image" "ubuntu_2404" {
   family  = "ubuntu-minimal-2404-lts-amd64"
     
 }
-
+data "google_compute_zones" "available" {
+  project = var.project_id
+  region  = var.region
+  status  = "UP"
+}
 resource "google_compute_instance_template" "odoo_prod_template" {
   name_prefix  = "odoo-prod-template-"
   machine_type = var.machine_type
@@ -170,7 +174,7 @@ resource "google_compute_instance_group_manager" "odoo_prod_mig" {
   name               = "odoo-prod-mig"
   base_instance_name = "odoo-prod-instance"
   target_size        = 1
-  zone               = var.zone
+  zone               = data.google_compute_zones.available.names[0]
 
   version {
     instance_template = google_compute_instance_template.odoo_prod_template.self_link
@@ -190,7 +194,7 @@ resource "google_compute_instance_group_manager" "odoo_prod_mig" {
 resource "google_compute_autoscaler" "odoo_prod_autoscaler" {
   name   = "odoo-prod-autoscaler"
   target = google_compute_instance_group_manager.odoo_prod_mig.self_link
-  zone = var.zone
+  zone   = data.google_compute_zones.available.names[0]
 
   autoscaling_policy {
     max_replicas    = var.max_size

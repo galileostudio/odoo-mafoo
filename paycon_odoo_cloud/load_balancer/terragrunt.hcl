@@ -12,6 +12,9 @@ dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
     subnet_self_link = "mock-subnet-self-link"
+    vpc_name = "mock-vpc-name"
+    vpc_self_link = "mock-vpc-self-link"
+    subnet_name = "mock-subnet-name"
   }
 }
 
@@ -40,5 +43,6 @@ inputs = {
   health_check_self_link = dependency.health_checks.outputs.health_check_self_link
   ssl_domains            = ["galileostdio.com"]
   enable_cdn             = false
+  vpc_name               = dependency.vpc.outputs.vpc_name
   
 }

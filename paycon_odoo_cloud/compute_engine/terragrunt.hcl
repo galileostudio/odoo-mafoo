@@ -54,11 +54,9 @@ dependency "health_checks" {
   }
 }
 
-
 inputs = {
   region                  = include.locals.region
   project_id              = include.locals.project_id
-  zone                    = "${include.locals.region}-a" 
   
   # Configurações de rede
   subnet_self_link        = dependency.vpc.outputs.subnet_self_link

@@ -78,8 +78,3 @@ variable "db_password" {
   type        = string
   description = "Database password for Odoo."
 }
-
-variable "zone" {
-  type    = string
-  default = "southamerica-east1-a"
-}

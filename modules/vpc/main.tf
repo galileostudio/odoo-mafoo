@@ -16,15 +16,6 @@ resource "google_compute_subnetwork" "main_subnet" {
   private_ip_google_access = true
 }
 
-output "vpc_self_link" {
-  value = google_compute_network.main_vpc.self_link
-}
-
-output "subnet_self_link" {
-  value = google_compute_subnetwork.main_subnet.self_link
-}
-
-
 resource "google_compute_global_address" "private_ip_range" {
   name          = "google-managed-services-${var.vpc_name}"
   purpose       = "VPC_PEERING"
@@ -48,6 +39,17 @@ resource "google_compute_firewall" "allow_packer_ssh" {
     ports    = ["22"]
   }
 
-  source_ranges = ["0.0.0.0/0"]  # Para testes. Em produção, restrinja para seu IP
-  target_tags   = ["packer"]
+  source_ranges = ["0.0.0.0/0"]
+}
+
+output "vpc_self_link" {
+  value = google_compute_network.main_vpc.self_link
+}
+
+output "subnet_self_link" {
+  value = google_compute_subnetwork.main_subnet.self_link
+}
+
+output "vpc_name" {
+  value = var.vpc_name
 }

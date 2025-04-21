@@ -48,7 +48,6 @@ resource "google_compute_global_forwarding_rule" "odoo_forwarding_rule" {
   load_balancing_scheme  = "EXTERNAL"
 }
 
-# (Opcional) Redirecionamento HTTP para HTTPS
 resource "google_compute_target_http_proxy" "odoo_http_proxy" {
   name    = "odoo-http-proxy"
   url_map = google_compute_url_map.odoo_url_map.self_link
@@ -63,7 +62,20 @@ resource "google_compute_global_forwarding_rule" "odoo_forwarding_rule_http" {
   load_balancing_scheme = "EXTERNAL"
 }
 
+resource "google_compute_firewall" "odoo_lb" {
+  name          = "odoo-lb-fw-rule"
+  network       = var.vpc_name
+  direction     = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
+  
+  allow {
+    protocol = "tcp"
+    ports    = ["80", "443", "8069"]
+  }
+  
+  target_tags = ["odoo-prod"]
+}
+
 output "lb_ip_address" {
   value = google_compute_global_forwarding_rule.odoo_forwarding_rule.ip_address
 }
-
