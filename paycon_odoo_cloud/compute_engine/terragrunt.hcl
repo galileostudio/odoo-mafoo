@@ -54,6 +54,7 @@ dependency "health_checks" {
   }
 }
 
+
 inputs = {
   region                  = include.locals.region
   project_id              = include.locals.project_id
@@ -81,10 +82,9 @@ inputs = {
   attachments_bucket_name = dependency.paycon_attachments.outputs.bucket_name
   
   # Configuração adicional para produção
-  machine_type            = "n1-standard-2"
+  machine_type            = "e2-standard-2"
   disk_size_gb            = 20
   disk_type               = "pd-ssd"
-  health_check_self_link = dependency.health_checks.outputs.health_check_self_link
-  
+  health_check_self_link = dependency.health_checks.outputs.health_check_self_link  
 
 }

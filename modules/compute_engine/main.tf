@@ -38,43 +38,87 @@ resource "google_compute_instance_template" "odoo_prod_template" {
       #!/bin/bash
       set -e
 
-      # ========== CONFIGURAÇÃO BÁSICA ==========
+      # ========== CONFIGURAÇÕES BÁSICAS ==========
       export DEBIAN_FRONTEND=noninteractive
+
+      # Atualiza o sistema
       apt-get update -y
       apt-get upgrade -y
 
-      # ========== INSTALA GCSFUSE ==========
-      
+      # ========== INSTALAÇÃO DO GCSFUSE ==========
+      # Instala dependências
+      apt-get install -y curl gnupg lsb-release fuse
+
+      # Configura repositório (corrige extensão .gpg)
       export GCSFUSE_REPO=gcsfuse-$(lsb_release -c -s)
-      echo "deb https://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
-      curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+        | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
+      echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt $GCSFUSE_REPO main" \
+        | sudo tee /etc/apt/sources.list.d/gcsfuse.list
+
       apt-get update -y
       apt-get install -y gcsfuse
 
-      # ========== PREPARA DIRETÓRIOS ==========
+      # ========== CONFIGURA USUÁRIO E PERMISSÕES ==========
+      # Cria usuário dedicado para Odoo (UID 1000)
+      if ! id odoo >/dev/null 2>&1; then
+        useradd -m -u 1000 -s /bin/bash odoo
+      fi
+
+      # Configura FUSE para permitir montagem por usuários não-root
+      echo "user_allow_other" | sudo tee -a /etc/fuse.conf
+      groupadd fuse 2>/dev/null || true
+      usermod -a -G fuse odoo
+
+      # Prepara diretórios de montagem
       mkdir -p /mnt/odoo-{attachments,plugins}
-      chown -R root:root /mnt/odoo-*
+      chown -R odoo:odoo /mnt/odoo-*
+      chmod 755 /mnt/odoo-*
 
-      # ========== MONTA BUCKETS ==========
-      echo "${var.plugins_bucket_name} /mnt/odoo-plugins gcsfuse rw,noauto,user,_netdev,implicit_dirs,allow_other,uid=0,gid=0" >> /etc/fstab
-      echo "${var.attachments_bucket_name} /mnt/odoo-attachments gcsfuse rw,noauto,user,_netdev,implicit_dirs,allow_other,uid=0,gid=0" >> /etc/fstab
+      # ========== CONFIGURA SERVIÇO GCSFUSE ==========
+      cat > /etc/systemd/system/gcsfuse-odoo.service <<EOF
+      [Unit]
+      Description=Mount GCS Buckets for Odoo
+      After=network.target
+      Requires=network-online.target
 
-      mount /mnt/odoo-plugins
-      mount /mnt/odoo-attachments
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      User=odoo
+      Group=odoo
+      ExecStart=/bin/sh -c 'gcsfuse -o allow_other,implicit_dirs,uid=1000,gid=1000 ${var.plugins_bucket_name} /mnt/odoo-plugins && \\
+                            gcsfuse -o allow_other,implicit_dirs,uid=1000,gid=1000 ${var.attachments_bucket_name} /mnt/odoo-attachments'
+      ExecStop=/bin/fusermount -u /mnt/odoo-plugins ; /bin/fusermount -u /mnt/odoo-attachments
 
-      # ========== INSTALAÇÃO ODOO ==========
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
+      # Ativa o serviço
+      systemctl daemon-reload
+      systemctl enable gcsfuse-odoo
+      systemctl start gcsfuse-odoo
+
+      # ========== INSTALAÇÃO DO ODOO ==========
+      # Dependências
       apt-get install -y git python3-pip python3-dev python3-venv \
                         build-essential libxslt-dev libzip-dev libldap2-dev \
                         libsasl2-dev libssl-dev libpq-dev nodejs npm wkhtmltopdf
 
+      # Clona repositório Odoo 17
       git clone --depth 1 --branch 17.0 https://github.com/odoo/odoo.git /opt/odoo17
+
+      # Configura ambiente virtual
       python3 -m venv /opt/odoo17/venv
       source /opt/odoo17/venv/bin/activate
       pip install --upgrade pip
       pip install -r /opt/odoo17/requirements.txt psycopg2-binary
 
-      # ========== CONFIGURA ODOO ==========
+      # ========== CONFIGURAÇÃO DO ODOO ==========
       mkdir -p /var/{log,lib}/odoo
+      chown -R odoo:odoo /var/{log,lib}/odoo
+
       cat > /etc/odoo.conf <<EOF
       [options]
       addons_path = /mnt/odoo-plugins,/opt/odoo17/addons
@@ -90,7 +134,7 @@ resource "google_compute_instance_template" "odoo_prod_template" {
       without_demo = True
       EOF
 
-      # ========== SYSTEMD SERVICE ==========
+      # ========== SERVIÇO SYSTEMD DO ODOO ==========
       cat > /etc/systemd/system/odoo.service <<EOF
       [Unit]
       Description=Odoo 17
@@ -99,48 +143,37 @@ resource "google_compute_instance_template" "odoo_prod_template" {
 
       [Service]
       Type=simple
-      User=root
-      Group=root
+      User=odoo
+      Group=odoo
       ExecStart=/opt/odoo17/venv/bin/python3 /opt/odoo17/odoo-bin -c /etc/odoo.conf
       Restart=always
       RestartSec=5
-      Environment="GCSFUSE_REPO=gcsfuse-\$(lsb_release -c -s)"
+      Environment="PATH=/opt/odoo17/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
       [Install]
       WantedBy=multi-user.target
       EOF
 
-      # ========== GCSFUSE SERVICE ==========
-      cat > /etc/systemd/system/gcsfuse-odoo.service <<EOF
-      [Unit]
-      Description=Mount GCS Buckets for Odoo
-      After=network.target
-
-      [Service]
-      Type=oneshot
-      RemainAfterExit=yes
-      ExecStart=/bin/sh -c 'gcsfuse -o allow_other,implicit_dirs,uid=0,gid=0 ${var.plugins_bucket_name} /mnt/odoo-plugins && \
-                            gcsfuse -o allow_other,implicit_dirs,uid=0,gid=0 ${var.attachments_bucket_name} /mnt/odoo-attachments'
-      ExecStop=/bin/fusermount -u /mnt/odoo-plugins && /bin/fusermount -u /mnt/odoo-attachments
-
-      [Install]
-      WantedBy=multi-user.target
-      EOF
-
-      # ========== INICIA SERVIÇOS ==========
+      # Ativa o serviço Odoo
       systemctl daemon-reload
-      systemctl enable gcsfuse-odoo
-      systemctl start gcsfuse-odoo
       systemctl enable odoo
       systemctl start odoo
 
       # ========== VERIFICAÇÃO FINAL ==========
+      echo "Verificando serviços..."
+      if ! systemctl is-active --quiet gcsfuse-odoo; then
+        echo "Erro: gcsfuse-odoo não está ativo!"
+        journalctl -u gcsfuse-odoo -b --no-pager
+        exit 1
+      fi
+
       if ! systemctl is-active --quiet odoo; then
-        echo "Falha ao iniciar Odoo"
+        echo "Erro: Odoo não está ativo!"
         journalctl -u odoo -b --no-pager
         exit 1
       fi
-      echo "Odoo iniciado com sucesso"
+
+      echo "Configuração concluída com sucesso!"
     EOT
   }
 
@@ -160,28 +193,19 @@ resource "google_compute_instance_template" "odoo_prod_template" {
   }
 }
 
-# ========== AUTO SCALING CONFIG ==========
-resource "google_compute_health_check" "odoo_health_check" {
-  name = "odoo-health-check"
-  check_interval_sec = 30
-  timeout_sec = 5
-
-  http_health_check {
-    port         = 8069
-    request_path = "/web/health"
-  }
-}
-
-resource "google_compute_instance_group_manager" "odoo_prod_mig" {
+resource "google_compute_region_instance_group_manager" "odoo_prod_mig" {
   name               = "odoo-prod-mig"
+  region             = var.region
   base_instance_name = "odoo-prod-instance"
-  target_size        = 1
-  zone               = data.google_compute_zones.available.names[0]
+  target_size        = var.initial_size
 
   version {
     instance_template = google_compute_instance_template.odoo_prod_template.self_link
   }
 
+  distribution_policy_zones = [ "${var.region}-a", "${var.region}-b", "${var.region}-c"]
+
+  
   named_port {
     name = "http"
     port = 8069
@@ -191,26 +215,17 @@ resource "google_compute_instance_group_manager" "odoo_prod_mig" {
     health_check      = var.health_check_self_link
     initial_delay_sec = 300
   }
-
-  distribution_policy {
-     # lista de zonas dentro da mesma região
-    zones = [
-      "${var.region}-a",
-      "${var.region}-b",
-      "${var.region}-c",
-    ]
-  }
-  
 }
 
-resource "google_compute_region_autoscaler" "odoo_prod_rascaler" {
+
+resource "google_compute_region_autoscaler" "odoo_prod_autoscaler" {
   name   = "odoo-prod-autoscaler"
   region = var.region
-  target = google_compute_region_instance_group_manager.odoo_prod_rmig.self_link
+  target = google_compute_region_instance_group_manager.odoo_prod_mig.self_link
 
   autoscaling_policy {
-    max_replicas    = var.max_size
     min_replicas    = var.initial_size
+    max_replicas    = var.max_size
     cooldown_period = 300
 
     cpu_utilization {
@@ -226,10 +241,11 @@ resource "google_compute_region_autoscaler" "odoo_prod_rascaler" {
 }
 
 
+
 output "instance_template_self_link" {
   value = google_compute_instance_template.odoo_prod_template.self_link
 }
 
 output "mig_self_link" {
-  value = google_compute_instance_group_manager.odoo_prod_mig.self_link
+  value = google_compute_region_instance_group_manager.odoo_prod_mig.self_link
 }

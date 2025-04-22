@@ -9,7 +9,7 @@ variable "region" {
 
 variable "machine_type" {
   type    = string
-  default = "f1-micro"
+  default = "e2-standard-2"
 }
 
 variable "service_account_email" {
