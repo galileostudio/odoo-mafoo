@@ -36,13 +36,34 @@ dependency "compute_engine" {
 }
 
 # Exemplo de inputs (ajuste conforme sua necessidade):
-inputs = {
-  region                 = include.locals.region
-  project_id             = include.locals.project_id
-  mig_self_link          = dependency.compute_engine.outputs.mig_self_link
-  health_check_self_link = dependency.health_checks.outputs.health_check_self_link
-  ssl_domains            = ["galileostdio.com"]
-  enable_cdn             = false
-  vpc_name               = dependency.vpc.outputs.vpc_name
+# inputs = {
+
+#   mig_self_link          = dependency.compute_engine.outputs.mig_self_link
+#   health_check_self_link = dependency.health_checks.outputs.health_check_self_link
+#   ssl_domains            = ["galileostdio.com"]
+#   enable_cdn             = false
+
   
+# }
+
+inputs = {
+  project_id               = include.locals.project_id
+  region                   = include.locals.region
+
+  # VPC/subnet (se o módulo usar)
+  vpc_name                 = dependency.vpc.outputs.vpc_name
+  vpc_self_link            = dependency.vpc.outputs.vpc_self_link
+  subnet_self_link         = dependency.vpc.outputs.subnet_self_link
+
+  # Managed Instance Group
+  mig_self_link            = dependency.compute_engine.outputs.mig_self_link
+  instance_group_self_link = dependency.compute_engine.outputs.instance_group_self_link
+
+  # Health check
+  health_check_self_link   = dependency.health_checks.outputs.health_check_self_link
+
+  # SSL
+  ssl_domains              = ["galileostudio.com"]
+  enable_cdn               = false
 }
+
