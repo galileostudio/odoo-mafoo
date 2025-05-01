@@ -64,10 +64,11 @@ resource "google_compute_instance_template" "odoo_prod_template" {
 
       # 3) Prepara diretórios e symlinks
       mkdir -p /mnt/odooplugins /mnt/odooattachments
-      chown odoo:fuse /mnt/odooplugins /mnt/odooattachments
+      chown odoo:odoo /mnt/odooplugins /mnt/odooattachments
       chmod 755 /mnt/odooplugins /mnt/odooattachments
       ln -sf /mnt/odooplugins     /mnt/odoo-plugins
       ln -sf /mnt/odooattachments /mnt/odoo-attachments
+      chown -h odoo:odoo /mnt/odoo-plugins /mnt/odoo-attachments
 
       # 4) Cria Mount Unit para plugins
       cat > /etc/systemd/system/mnt-odooplugins.mount <<EOF
@@ -80,7 +81,7 @@ resource "google_compute_instance_template" "odoo_prod_template" {
       What=${var.plugins_bucket_name}
       Where=/mnt/odooplugins
       Type=gcsfuse
-      Options=rw,allow_other,implicit_dirs,file_mode=0644,dir_mode=0755
+      Options=rw,allow_other,uid=$(id -u odoo),gid=$(id -g odoo),implicit_dirs,file_mode=0644,dir_mode=0755
 
       [Install]
       WantedBy=remote-fs.target
@@ -97,7 +98,7 @@ resource "google_compute_instance_template" "odoo_prod_template" {
       What=${var.attachments_bucket_name}
       Where=/mnt/odooattachments
       Type=gcsfuse
-      Options=rw,allow_other,implicit_dirs,file_mode=0644,dir_mode=0755
+      Options=rw,allow_other,uid=$(id -u odoo),gid=$(id -g odoo),implicit_dirs,file_mode=0644,dir_mode=0755
 
       [Install]
       WantedBy=remote-fs.target
