@@ -113,13 +113,21 @@ resource "google_compute_instance_template" "odoo_prod_template" {
       git python3-pip python3-dev python3-venv \
       build-essential libxslt-dev libzip-dev \
       libldap2-dev libsasl2-dev libssl-dev \
-      libpq-dev nodejs npm wkhtmltopdf
+      libpq-dev
+      
+      apt-get install -y \
+      nodejs npm
+      ln -sf /usr/bin/nodejs /usr/bin/node || true
+      npm install -g less less-plugin-clean-css || apt-get install -y node-less
+
+      apt-get install -y fontconfig xfonts-75dpi xfonts-base wkhtmltopdf
 
       git clone --depth 1 --branch 17.0 https://github.com/odoo/odoo.git /opt/odoo17
 
       python3 -m venv /opt/odoo17/venv
       source /opt/odoo17/venv/bin/activate
-      pip install --upgrade pip
+      pip install --upgrade pip wheel
+      pip install redis
       pip install -r /opt/odoo17/requirements.txt psycopg2-binary
 
       mkdir -p /var/lib/odoo /var/log/odoo
@@ -127,8 +135,8 @@ resource "google_compute_instance_template" "odoo_prod_template" {
 
       cat > /etc/odoo.conf <<EOF
       [options]
-      addons_path = /mnt/odooplugins,/opt/odoo17/addons
-      data_dir    = /mnt/odooattachments
+      addons_path = /mnt/odoo-plugins,/opt/odoo17/addons
+      data_dir    = /mnt/odoo-attachments
       admin_passwd = ${random_password.odoo_admin.result}
       db_host     = ${var.db_host}
       db_port     = 5432
@@ -138,6 +146,9 @@ resource "google_compute_instance_template" "odoo_prod_template" {
       log_level   = info
       proxy_mode  = True
       without_demo = True
+      xmlrpc_interface = 0.0.0.0
+      xmlrpc_port      = 8069
+
       EOF
       chown odoo:odoo /etc/odoo.conf
       chmod 600 /etc/odoo.conf

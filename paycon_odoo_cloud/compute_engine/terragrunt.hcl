@@ -87,4 +87,8 @@ inputs = {
   disk_type               = "pd-ssd"
   health_check_self_link = dependency.health_checks.outputs.health_check_self_link  
 
+  # redis
+  redis_host = dependency.memorystore.outputs.host
+  redis_port = dependency.memorystore.outputs.port
+
 }

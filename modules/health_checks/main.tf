@@ -13,7 +13,7 @@ resource "google_compute_health_check" "odoo" {
 
   http_health_check {
     port         = 8069
-    request_path = "/web/health"
+    request_path = "/"
   }
 }
 
