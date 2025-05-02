@@ -29,13 +29,6 @@ dependency "paycon_attachments" {
   }
 }
 
-dependency "memorystore" {
-  config_path = "../memorystore"
-  mock_outputs = {
-    private_ip = "0.0.0.0"
-  }
-}
-
 dependency "cloud_sql" {
   config_path = "../cloud_sql"
   mock_outputs = {
@@ -75,7 +68,6 @@ inputs = {
   db_host                 = dependency.cloud_sql.outputs.private_ip
   db_username             = dependency.cloud_sql.outputs.db_username
   db_password             = dependency.cloud_sql.outputs.db_password
-  cache_private_ip        = dependency.memorystore.outputs.private_ip
   
   # Buckets GCS
   plugins_bucket_name     = dependency.paycon_plugins.outputs.bucket_name
@@ -86,9 +78,5 @@ inputs = {
   disk_size_gb            = 20
   disk_type               = "pd-ssd"
   health_check_self_link = dependency.health_checks.outputs.health_check_self_link  
-
-  # redis
-  redis_host = dependency.memorystore.outputs.host
-  redis_port = dependency.memorystore.outputs.port
 
 }

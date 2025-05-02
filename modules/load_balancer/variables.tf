@@ -18,6 +18,11 @@ variable "mig_self_link" {
   description = "Self link do Managed Instance Group"
 }
 
+variable "instance_group_self_link" {
+  description = "Self-link do instance group (não do manager)"
+  type        = string
+}
+
 variable "enable_cdn" {
   type        = bool
   default     = false

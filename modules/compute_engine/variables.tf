@@ -79,11 +79,3 @@ variable "db_password" {
   description = "Database password for Odoo."
 }
 
-variable "redis_host" {
-  type       = string
-  description = "Redis host."
-}
-variable "redis_port" {
-  type       = number
-  description = "Redis port."
-}
