@@ -63,7 +63,7 @@ inputs = {
   health_check_self_link   = dependency.health_checks.outputs.health_check_self_link
 
   # SSL
-  ssl_domains              = ["galileostudio.com"]
+  ssl_domains              = ["odoo.galileostdio.com"]
   enable_cdn               = false
 }
 
