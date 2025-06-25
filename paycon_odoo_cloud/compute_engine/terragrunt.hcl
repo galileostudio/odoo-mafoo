@@ -62,7 +62,7 @@ inputs = {
   cpu_target              = 0.75
   
   # Service account
-  service_account_email   = "the-ring@paycon-454222.iam.gserviceaccount.com"
+  service_account_email   = "the-ring@master-462418.iam.gserviceaccount.com"
   
   # Conexões com outros serviços
   db_host                 = dependency.cloud_sql.outputs.private_ip

@@ -11,7 +11,7 @@ dependency "vpc" {
   config_path = "../vpc"
 
   mock_outputs = {
-    vpc_self_link = "projects/paycon-454222/global/networks/paycon-vpc"
+    vpc_self_link = "projects/master-462418/global/networks/paycon-vpc"
   }
 }
 
