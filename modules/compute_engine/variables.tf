@@ -8,8 +8,7 @@ variable "region" {
 }
 
 variable "machine_type" {
-  type    = string
-  default = "e2-standard-2"
+  type = string
 }
 
 variable "service_account_email" {
@@ -20,38 +19,32 @@ variable "subnet_self_link" {
   type = string
 }
 
-variable "health_check_self_link" {
+#variable "health_check_self_link" {
+#  type = string
+#}
+
+variable "disk_type" {
   type = string
 }
 
-variable "disk_type" {
-  type    = string
-  default = "pd-ssd"
-}
-
 variable "initial_size" {
-  type    = number
-  default = 1
+  type = number
 }
 
 variable "min_size" {
-  type    = number
-  default = 1
+  type = number
 }
 
 variable "max_size" {
-  type    = number
-  default = 5
+  type = number
 }
 
 variable "cpu_target" {
-  type    = number
-  default = 0.75
+  type = number
 }
 
 variable "disk_size_gb" {
-  type    = number
-  default = 20
+  type = number
 }
 
 variable "attachments_bucket_name" {
@@ -79,3 +72,116 @@ variable "db_password" {
   description = "Database password for Odoo."
 }
 
+variable "environment" {
+  type        = string
+  description = "Environment name (e.g., prod, dev, staging)."
+}
+
+variable "cost_center" {
+  type = string
+}
+
+variable "application_name" {
+  type        = string
+  description = "Nome da aplicação, usado para prefixar recursos."
+}
+
+variable "allow_health_checks" {
+  type        = bool
+  default     = true
+  description = "Permitir health checks no grupo de instâncias."
+}
+
+variable "allow_ssh" {
+  type        = bool
+  default     = true
+  description = "Permitir acesso SSH às instâncias."
+}
+
+variable "additional_tags" {
+  type        = list(string)
+  default     = []
+  description = "Tags adicionais para as instâncias."
+}
+
+variable "compute_image_project" {
+  type        = string
+  default     = "ubuntu-os-cloud"
+  description = "Projeto do GCP onde a imagem do Compute Engine está localizada."
+}
+variable "compute_image_family" {
+  type        = string
+  default     = "ubuntu-minimal-2404-lts-amd64"
+  description = "Família da imagem do Compute Engine."
+}
+variable "compute_name_prefix" {
+  type        = string
+  default     = "odoo-prod-template-"
+  description = "Prefixo para o nome do template de instância."
+}
+
+variable "admin_password_override" {
+  type        = string
+  default     = ""
+  description = "Senha do administrador da aplicação. Se não for fornecida, será gerada uma senha aleatória."
+}
+
+variable "odoo_version" {
+  type        = string
+  default     = "16.0"
+  description = "Versão do Odoo a ser instalada."
+}
+
+variable "log_level" {
+  type        = string
+  default     = "info"
+  description = "Nível de log para a aplicação."
+}
+
+variable "proxy_mode" {
+  type        = bool
+  default     = false
+  description = "Habilitar modo proxy reverso."
+}
+
+variable "max_cron_threads" {
+  type        = number
+  default     = 2
+  description = "Número máximo de threads cron para aplicação."
+}
+
+variable "workers" {
+  type        = number
+  default     = 2
+  description = "Número de workers para a aplicação."
+}
+
+variable "additional_addons_paths" {
+  type        = list(string)
+  default     = []
+  description = "Caminhos adicionais para addons personalizados."
+}
+
+variable "compute_group_manager" {
+  type        = string
+  default     = "odoo-prod-mig"
+  description = "Nome do gerenciador de grupos de instâncias."
+}
+
+variable "base_instance_name" {
+  type        = string
+  default     = "odoo-prod-instance"
+  description = "Nome base para as instâncias do Compute Engine."
+}
+
+variable "compute_autoscaler_name" {
+  type        = string
+  default     = "odoo-prod-autoscaler"
+  description = "Nome do autoscaler para o grupo de instâncias."
+}
+
+variable "compute_named_port" {
+  type        = number
+  default     = 8069
+  description = "Porta nomeada para o grupo de instâncias."
+}
