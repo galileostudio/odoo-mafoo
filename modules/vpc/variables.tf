@@ -1,7 +1,7 @@
 variable "project_id" {
   type = string
   validation {
-    condition = length(var.project_id) > 0
+    condition     = length(var.project_id) > 0
     error_message = "O project_id não pode estar vazio."
   }
 }
@@ -17,9 +17,9 @@ variable "region" {
 }
 
 variable "vpc_name" {
-  type = string
+  type     = string
   validation {
-    condition = can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.vpc_name))
+    condition     = can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.vpc_name))
     error_message = "Nome da VPC deve seguir as convenções do GCP."
   }
 }
@@ -32,7 +32,7 @@ variable "subnet_cidr" {
   type    = string
   default = "10.0.0.0/24"
   validation {
-    condition = can(cidrhost(var.subnet_cidr, 0))
+    condition     = can(cidrhost(var.subnet_cidr, 0))
     error_message = "subnet_cidr deve ser um CIDR válido."
   }
 }
@@ -43,6 +43,15 @@ variable "delete_default_routes" {
 }
 
 variable "create_default_route" {
-  type        = bool
-  default     = true
+  type    = bool
+  default = true
+}
+
+variable "allowed_application_ports" {
+  type    = list(string)
+  default = ["8069", "8071", "8072"]
+  validation {
+    condition     = length(var.allowed_application_ports) > 0
+    error_message = "A lista de portas permitidas não pode estar vazia."
+  }
 }

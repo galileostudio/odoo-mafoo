@@ -55,10 +55,20 @@ resource "google_compute_firewall" "allow_packer_ssh" {
     protocol = "tcp"
     ports    = ["22"]
   }
-
   source_ranges = ["0.0.0.0/0"]
 }
 
+resource "google_compute_firewall" "allow_packer_application" {
+  name      = "${var.vpc_name}-allow-application"
+  network   = google_compute_network.main_vpc.name
+  direction = "INGRESS"
+  allow {
+    protocol = "tcp"
+    ports    = var.allowed_application_ports
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
 resource "google_compute_firewall" "allow_internal" {
   name      = "${var.vpc_name}-allow-internal"
   network   = google_compute_network.main_vpc.name
@@ -89,11 +99,11 @@ resource "google_compute_router" "nat_router" {
 }
 
 resource "google_compute_router_nat" "nat_config" {
-  name                   = "${var.vpc_name}-nat-gateway"
-  router                 = google_compute_router.nat_router.name
-  region                 = var.region
-  
-  nat_ip_allocate_option = "AUTO_ONLY"
+  name   = "${var.vpc_name}-nat-gateway"
+  router = google_compute_router.nat_router.name
+  region = var.region
+
+  nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
