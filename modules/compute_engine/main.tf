@@ -1,28 +1,8 @@
 terraform {
   backend "gcs" {}
 }
-locals {
-  common_labels = {
-    project     = var.project_id
-    region      = var.region
-    environment = var.environment
-    application = var.application_name
-    module      = "compute_engine"
-    managed-by  = "terraform"
-    cost_center = var.cost_center
-  }
-
-  name_prefix = "${locals.environment}-${locals.application}"
-  zones       = data.google_compute_zones.available.names
-  network_tags = concat(
-    ["${locals.application}-${locals.environment}"],
-    var.allow_health_checks ? ["allow-health-checks"] : [],
-    var.allow_ssh ? ["allow-ssh"] : [],
-    var.additional_tags
-  )
-}
 resource "null_resource" "validate_zones" {
-  count = length(local.zones) > 0 ? 0 : 1
+  count = length(data.google_compute_zones.available.names) > 0 ? 0 : 1
 
   provisioner "local-exec" {
     command = "echo 'Error: No available zones found in the selected region.' && exit 1"
@@ -33,9 +13,13 @@ resource "random_password" "this" {
   special = true
 }
 
+resource "google_compute_address" "static" {
+  name = "ipv4-address"
+}
+
 data "google_compute_image" "this" {
-  project = var.compute_image_project #"ubuntu-os-cloud"
-  family  = var.compute_image_family  #"ubuntu-minimal-2404-lts-amd64"   
+  project = var.compute_image_project
+  family  = var.compute_image_family
 }
 
 data "google_compute_zones" "available" {
@@ -45,7 +29,7 @@ data "google_compute_zones" "available" {
 }
 
 resource "google_compute_instance_template" "this" {
-  name_prefix  = local.name_prefix
+  name_prefix  = "${var.enviroment}-${var.application_name}-template-"
   machine_type = var.machine_type
   region       = var.region
 
@@ -59,6 +43,9 @@ resource "google_compute_instance_template" "this" {
 
   network_interface {
     subnetwork = var.subnet_self_link
+    access_config {
+      nat_ip = google_compute_address.static.address
+    }
   }
   metadata = {
     startup-script = templatefile("${path.module}/scripts/startup-odoo.sh", {
@@ -67,14 +54,8 @@ resource "google_compute_instance_template" "this" {
       db_password        = var.db_password != "" ? var.db_password : random_password.this.result
       plugins_bucket     = var.plugins_bucket_name
       attachments_bucket = var.attachments_bucket_name
-      admin_password     = var.admin_password_override != "" ? var.admin_password_override : random_password.this.result
       odoo_version       = var.odoo_version
-      environment        = var.environment
-      log_level          = var.log_level
-      proxy_mode         = var.proxy_mode
-      max_cron_threads   = var.max_cron_threads
-      workers            = var.workers
-      additional_addons  = join(",", var.additional_addons_paths)
+      environment        = var.enviroment
     })
     enable-oslogin     = "TRUE"
     block-project-keys = "TRUE"
@@ -82,7 +63,7 @@ resource "google_compute_instance_template" "this" {
     google-monitoring-enabled = "TRUE"
     google-logging-enabled    = "TRUE"
 
-    odoo-environment = var.environment
+    odoo-environment = var.enviroment
     odoo-version     = var.odoo_version
   }
 
@@ -95,7 +76,12 @@ resource "google_compute_instance_template" "this" {
     ]
   }
 
-  tags = local.network_tags
+  tags = concat(
+    ["${var.application_name}-${var.enviroment}"],
+    var.allow_health_checks ? ["allow-health-checks"] : [],
+    var.allow_ssh ? ["allow-ssh"] : [],
+    var.additional_tags
+  )
 
   lifecycle {
     create_before_destroy = true
@@ -112,7 +98,8 @@ resource "google_compute_region_instance_group_manager" "this" {
     instance_template = google_compute_instance_template.this.self_link
   }
 
-  distribution_policy_zones = local.zones
+  distribution_policy_zones = data.google_compute_zones.available.names
+
 
   named_port {
     name = "http"
@@ -126,12 +113,12 @@ resource "google_compute_region_instance_group_manager" "this" {
 }
 
 resource "google_compute_region_autoscaler" "this" {
-  name   = var.compute_autoscaler_name #"odoo-prod-autoscaler"
+  name   = var.compute_autoscaler_name
   region = var.region
   target = google_compute_region_instance_group_manager.this.self_link
 
   autoscaling_policy {
-    min_replicas    = var.initial_size
+    min_replicas    = var.min_size
     max_replicas    = var.max_size
     cooldown_period = 300
 

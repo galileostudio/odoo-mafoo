@@ -72,7 +72,7 @@ variable "db_password" {
   description = "Database password for Odoo."
 }
 
-variable "environment" {
+variable "enviroment" {
   type        = string
   description = "Environment name (e.g., prod, dev, staging)."
 }
