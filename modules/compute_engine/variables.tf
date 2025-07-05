@@ -106,12 +106,12 @@ variable "additional_tags" {
 
 variable "compute_image_project" {
   type        = string
-  default     = "ubuntu-os-cloud"
+  default     = "debian-cloud"
   description = "Projeto do GCP onde a imagem do Compute Engine está localizada."
 }
 variable "compute_image_family" {
   type        = string
-  default     = "ubuntu-minimal-2404-lts-amd64"
+  default     = "debian-12"
   description = "Família da imagem do Compute Engine."
 }
 variable "compute_name_prefix" {

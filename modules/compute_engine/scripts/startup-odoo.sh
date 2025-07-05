@@ -118,7 +118,7 @@ if [ -f /usr/share/keyrings/odoo-archive-keyring.gpg ]; then
     rm -f /usr/share/keyrings/odoo-archive-keyring.gpg
 fi
 wget -qO- https://nightly.odoo.com/odoo.key | gpg --dearmor -o /usr/share/keyrings/odoo-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/odoo-archive-keyring.gpg] https://nightly.odoo.com/18.0/nightly/deb/ ./" > /etc/apt/sources.list.d/odoo.list
+echo "deb [signed-by=/usr/share/keyrings/odoo-archive-keyring.gpg] https://nightly.odoo.com/17.0/nightly/deb/ ./" > /etc/apt/sources.list.d/odoo.list
 apt-get update && apt-get install -y odoo
 mkdir -p /var/lib/odoo /var/log/odoo
 chown -R odoo:odoo /var/lib/odoo /var/log/odoo
