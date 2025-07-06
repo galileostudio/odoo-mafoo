@@ -1,12 +1,12 @@
 include {
-  path = find_in_parent_folders("root.hcl")
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 locals {
   config_vars = read_terragrunt_config(find_in_parent_folders("secrets.hcl"))
 }
 terraform {
-  source = "${get_parent_terragrunt_dir()}/modules/vpc"
+  source = "${get_repo_root()}/modules/vpc"
 }
 
 inputs = {
