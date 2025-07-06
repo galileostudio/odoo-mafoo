@@ -18,9 +18,38 @@ handle_error() {
     log "ERROR: Linha $1: Comando falhou"
     exit 1
 }
+
+add_unique_line() {
+    local line="$1"
+    local file="$2"
+    grep -qxF "$line" "$file" || echo "$line" >> "$file"
+}
+
+ensure_dir() {
+    dir="$1"
+    owner="$2"
+    perm="755"
+    if [ -n "$3" ]; then
+        perm="$3"
+    fi
+    mkdir -p "$dir"
+    chown "$owner" "$dir"
+    chmod "$perm" "$dir"
+}
+
 export DEBIAN_FRONTEND=noninteractive
 trap 'handle_error $LINENO' ERR
 
+log "##################"
+log "Otimizando o sistema operacional..."
+add_unique_line "vm.dirty_ratio=6" /etc/sysctl.conf
+add_unique_line "vm.dirty_background_ratio=3" /etc/sysctl.conf
+add_unique_line "vm.vfs_cache_pressure=50" /etc/sysctl.conf
+add_unique_line "vm.swappiness=10" /etc/sysctl.conf
+add_unique_line "vm.max_map_count=262144" /etc/sysctl.conf
+add_unique_line "fs.file-max=2097152" /etc/sysctl.conf
+sysctl -p
+log "##################"
 log "Iniciando configuração do Odoo..."
 log "##################"
 
@@ -100,8 +129,8 @@ fi
 
 log "Habilitando e montando volumes..."
 systemctl daemon-reload
-systemctl enable --now mnt-odooplugins.mount
-systemctl enable --now mnt-odooattachments.mount
+#systemctl enable --now mnt-odooplugins.mount
+#systemctl enable --now mnt-odooattachments.mount
 
 log "Instalando dependências do Odoo..."
 apt-get install -y git python3-pip python3-dev python3-venv \
@@ -120,8 +149,9 @@ fi
 wget -qO- https://nightly.odoo.com/odoo.key | gpg --dearmor -o /usr/share/keyrings/odoo-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/odoo-archive-keyring.gpg] https://nightly.odoo.com/17.0/nightly/deb/ ./" > /etc/apt/sources.list.d/odoo.list
 apt-get update && apt-get install -y odoo
-mkdir -p /var/lib/odoo /var/log/odoo
-chown -R odoo:odoo /var/lib/odoo /var/log/odoo
+ensure_dir "/opt/odoo17/addons" "odoo:odoo"
+ensure_dir "/var/lib/odoo" "odoo:odoo"
+ensure_dir "/var/log/odoo" "odoo:odoo"
 cat > /etc/odoo/odoo.conf <<EOF
 [options]
 addons_path = /mnt/odoo-plugins,/opt/odoo17/addons
