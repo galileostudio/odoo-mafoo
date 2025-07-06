@@ -8,12 +8,14 @@ locals {
 }
 
 terraform {
-  source = "${get_parent_terragrunt_dir()}/modules/compute_engine"
+  source = "${get_repo_root()}/modules/compute_engine"
 }
 
-# Dependências obrigatórias
 dependency "vpc" {
   config_path = "../vpc"
+  mock_outputs = {
+    vpc_output = "mock-vpc-output"
+  }
 }
 
 #dependency "cloud_storage_plugins" {
@@ -30,14 +32,17 @@ dependency "vpc" {
 #  }
 #}
 
-#dependency "cloud_sql" {
-#  config_path = "../cloud_sql"
-#  mock_outputs = {
-#    private_ip = "10.0.0.1"
-#    db_username = "odoo"       # Adicione mock para testes
-#    db_password = "change_me"  # Adicione mock para testes
-#  }
-#}
+dependency "cloud_sql" {
+  config_path = "../cloud_sql"
+
+  mock_outputs = {
+    db_name     = "mock-cloud_sql-output"
+    db_password = "mock-cloud_sql-password"
+    db_username = "mock-cloud_sql-username"
+    db_host     = "mock-cloud_sql-host"
+    private_ip  = "mock-cloud_sql-private_ip"
+  }
+}
 
 
 #dependency "health_checks" {
@@ -49,19 +54,14 @@ dependency "vpc" {
 
 
 inputs = {
-  application_name = "odoo"
-  enviroment       = "prod"
-
   attachments_bucket_name = "aa"
   cost_center             = "all"
-  db_host                 = 123
-  db_password             = 123
-  db_username             = "as"
+  db_host                 = dependency.cloud_sql.outputs.private_ip
+  db_password             = dependency.cloud_sql.outputs.db_password
+  db_username             = dependency.cloud_sql.outputs.db_username
+  db_name                 = dependency.cloud_sql.outputs.db_name
   plugins_bucket_name     = 123
   additional_addons_paths = ["/tmp", "/tmp/plugins"]
-
-  region     = local.config_vars.locals.region
-  project_id = local.config_vars.locals.project_id
 
   # Configurações de rede
   subnet_self_link = dependency.vpc.outputs.subnet_self_link
@@ -69,7 +69,7 @@ inputs = {
   # Configurações de auto-scaling
   initial_size = 1
   min_size     = 1
-  max_size     = 5
+  max_size     = 4
   cpu_target   = 0.75
 
   # Service account
@@ -80,8 +80,8 @@ inputs = {
   #attachments_bucket_name = dependency.paycon_attachments.outputs.bucket_name
 
   # Configuração adicional para produção
-  machine_type = local.config_vars.locals.machine_type
-  disk_size_gb = local.config_vars.locals.disk_size_gb
-  disk_type    = local.config_vars.locals.disk_type
+  machine_type = "e2-standard-2"
+  disk_size_gb = 25
+  disk_type    = "pd-ssd"
   # health_check_self_link = dependency.health_checks.outputs.health_check_self_link
 }

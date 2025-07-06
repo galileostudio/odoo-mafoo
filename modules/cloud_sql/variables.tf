@@ -21,16 +21,27 @@ variable "vpc_self_link" {
 }
 
 variable "db_name" {
-  type    = string
-  default = "odoodb"
+  type = string
 }
 
 variable "db_username" {
-  type    = string
-  default = "odoo"
+  type = string
 }
 
 variable "db_password" {
+  type = string
+}
+
+variable "database_version" {
   type    = string
-  default = "change_me"
+  default = "POSTGRES_14"
+}
+
+variable "application_name" {
+  type        = string
+  description = "Nome da aplicação, usado para prefixar recursos."
+}
+
+variable "enviroment" {
+  type = string
 }
