@@ -41,8 +41,8 @@ No modules.
 | <a name="input_base_instance_name"></a> [base\_instance\_name](#input\_base\_instance\_name) | Nome base para as instâncias do Compute Engine. | `string` | `"odoo-prod-instance"` | no |
 | <a name="input_compute_autoscaler_name"></a> [compute\_autoscaler\_name](#input\_compute\_autoscaler\_name) | Nome do autoscaler para o grupo de instâncias. | `string` | `"odoo-prod-autoscaler"` | no |
 | <a name="input_compute_group_manager"></a> [compute\_group\_manager](#input\_compute\_group\_manager) | Nome do gerenciador de grupos de instâncias. | `string` | `"odoo-prod-mig"` | no |
-| <a name="input_compute_image_family"></a> [compute\_image\_family](#input\_compute\_image\_family) | Família da imagem do Compute Engine. | `string` | `"ubuntu-minimal-2404-lts-amd64"` | no |
-| <a name="input_compute_image_project"></a> [compute\_image\_project](#input\_compute\_image\_project) | Projeto do GCP onde a imagem do Compute Engine está localizada. | `string` | `"ubuntu-os-cloud"` | no |
+| <a name="input_compute_image_family"></a> [compute\_image\_family](#input\_compute\_image\_family) | Família da imagem do Compute Engine. | `string` | `"debian-12"` | no |
+| <a name="input_compute_image_project"></a> [compute\_image\_project](#input\_compute\_image\_project) | Projeto do GCP onde a imagem do Compute Engine está localizada. | `string` | `"debian-cloud"` | no |
 | <a name="input_compute_name_prefix"></a> [compute\_name\_prefix](#input\_compute\_name\_prefix) | Prefixo para o nome do template de instância. | `string` | `"odoo-prod-template-"` | no |
 | <a name="input_compute_named_port"></a> [compute\_named\_port](#input\_compute\_named\_port) | Porta nomeada para o grupo de instâncias. | `number` | `8069` | no |
 | <a name="input_cost_center"></a> [cost\_center](#input\_cost\_center) | n/a | `string` | n/a | yes |
