@@ -25,12 +25,12 @@ dependency "vpc" {
 #  }
 #}
 #
-#dependency "paycon_attachments" {
-#  config_path = "../cloud_storage_attachments"
-#  mock_outputs = {
-#    bucket_name = "mock-attachments-bucket"
-#  }
-#}
+dependency "paycon_attachments" {
+  config_path = "../cloud_storage_attachments"
+  mock_outputs = {
+    bucket_name = "mock-attachments-bucket"
+  }
+}
 
 dependency "cloud_sql" {
   config_path = "../cloud_sql"
@@ -45,16 +45,16 @@ dependency "cloud_sql" {
 }
 
 
-#dependency "health_checks" {
-#  config_path = "../health_checks"
-#  mock_outputs = {
-#    health_check_self_link = "mock-health-check"
-#  }
-#}
+dependency "health_checks" {
+  config_path = "../health_checks"
+  mock_outputs = {
+    health_check_self_link = "mock-health-check"
+  }
+}
 
 
 inputs = {
-  attachments_bucket_name = "aa"
+  attachments_bucket_name = dependency.paycon_attachments.outputs.bucket_name
   cost_center             = "all"
   db_host                 = dependency.cloud_sql.outputs.private_ip
   db_password             = dependency.cloud_sql.outputs.db_password
@@ -80,8 +80,8 @@ inputs = {
   #attachments_bucket_name = dependency.paycon_attachments.outputs.bucket_name
 
   # Configuração adicional para produção
-  machine_type = "e2-standard-2"
-  disk_size_gb = 25
-  disk_type    = "pd-ssd"
-  # health_check_self_link = dependency.health_checks.outputs.health_check_self_link
+  machine_type           = "e2-standard-2"
+  disk_size_gb           = 25
+  disk_type              = "pd-ssd"
+  health_check_self_link = dependency.health_checks.outputs.health_check_self_link
 }

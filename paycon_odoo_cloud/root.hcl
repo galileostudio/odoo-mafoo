@@ -16,8 +16,9 @@ inputs = {
   application_name = "odoo"
   enviroment       = "prod"
 
-  region     = local.config_vars.locals.region
-  project_id = local.config_vars.locals.project_id
+  region            = local.config_vars.locals.region
+  project_id        = local.config_vars.locals.project_id
+  health_check_name = "health-check"
 }
 
 terraform {
