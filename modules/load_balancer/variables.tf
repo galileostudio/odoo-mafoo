@@ -39,3 +39,13 @@ variable "health_check_self_link" {
   type        = string
   description = "Self link do health check criado no módulo health_checks"
 }
+variable "health_check_port" {
+  type        = number
+  default     = 8069
+  description = "Porta do health check do load balancer"
+}
+
+variable "application_name" {
+  type        = string
+  description = "Nome da aplicação, usado para prefixar recursos."
+}

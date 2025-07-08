@@ -29,6 +29,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_application_name"></a> [application\_name](#input\_application\_name) | Nome da aplicação, usado para prefixar recursos. | `string` | n/a | yes |
 | <a name="input_backend_service_name"></a> [backend\_service\_name](#input\_backend\_service\_name) | Nome do serviço de backend do load balancer | `string` | n/a | yes |
 | <a name="input_cert_name"></a> [cert\_name](#input\_cert\_name) | Nome do certificado SSL gerenciado | `string` | n/a | yes |
 | <a name="input_enable_cdn"></a> [enable\_cdn](#input\_enable\_cdn) | Habilita CDN no load balancer | `bool` | `false` | no |
