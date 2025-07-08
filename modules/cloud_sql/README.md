@@ -25,16 +25,16 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_application_name"></a> [application\_name](#input\_application\_name) | Nome da aplicação, usado para prefixar recursos. | `string` | n/a | yes |
-| <a name="input_database_version"></a> [database\_version](#input\_database\_version) | n/a | `string` | `"POSTGRES_14"` | no |
-| <a name="input_db_name"></a> [db\_name](#input\_db\_name) | n/a | `string` | n/a | yes |
-| <a name="input_db_password"></a> [db\_password](#input\_db\_password) | n/a | `string` | n/a | yes |
-| <a name="input_db_username"></a> [db\_username](#input\_db\_username) | n/a | `string` | n/a | yes |
-| <a name="input_enviroment"></a> [enviroment](#input\_enviroment) | n/a | `string` | n/a | yes |
-| <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | n/a | `string` | `"odoo-postgres"` | no |
-| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
-| <a name="input_region"></a> [region](#input\_region) | n/a | `string` | n/a | yes |
-| <a name="input_tier"></a> [tier](#input\_tier) | n/a | `string` | `"db-f1-micro"` | no |
-| <a name="input_vpc_self_link"></a> [vpc\_self\_link](#input\_vpc\_self\_link) | n/a | `string` | n/a | yes |
+| <a name="input_database_version"></a> [database\_version](#input\_database\_version) | Versão do banco de dados a ser usado na instância do Cloud SQL. | `string` | `"POSTGRES_14"` | no |
+| <a name="input_db_name"></a> [db\_name](#input\_db\_name) | Nome do banco de dados a ser criado na instância do Cloud SQL. | `string` | n/a | yes |
+| <a name="input_db_password"></a> [db\_password](#input\_db\_password) | Senha para o usuário do banco de dados. | `string` | n/a | yes |
+| <a name="input_db_username"></a> [db\_username](#input\_db\_username) | Nome de usuário para acessar o banco de dados. | `string` | n/a | yes |
+| <a name="input_enviroment"></a> [enviroment](#input\_enviroment) | Ambiente de desenvolvimento, teste ou produção. | `string` | n/a | yes |
+| <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | Nome da instância do Cloud SQL. | `string` | `"database"` | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Valor do ID do projeto GCP onde os recursos serão criados. | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | Valor da região onde os recursos serão criados. | `string` | n/a | yes |
+| <a name="input_tier"></a> [tier](#input\_tier) | Tipo de máquina para a instância do Cloud SQL. | `string` | `"db-f1-micro"` | no |
+| <a name="input_vpc_self_link"></a> [vpc\_self\_link](#input\_vpc\_self\_link) | Link completo para a VPC onde a instância do Cloud SQL será criada. | `string` | n/a | yes |
 
 ## Outputs
 

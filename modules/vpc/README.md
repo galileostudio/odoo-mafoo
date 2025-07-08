@@ -31,14 +31,14 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_allowed_application_ports"></a> [allowed\_application\_ports](#input\_allowed\_application\_ports) | n/a | `list(string)` | <pre>[<br/>  "8069",<br/>  "8071",<br/>  "8072"<br/>]</pre> | no |
-| <a name="input_create_default_route"></a> [create\_default\_route](#input\_create\_default\_route) | n/a | `bool` | `true` | no |
-| <a name="input_delete_default_routes"></a> [delete\_default\_routes](#input\_delete\_default\_routes) | n/a | `bool` | `false` | no |
-| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
-| <a name="input_region"></a> [region](#input\_region) | n/a | `string` | n/a | yes |
-| <a name="input_subnet_cidr"></a> [subnet\_cidr](#input\_subnet\_cidr) | n/a | `string` | `"10.0.0.0/24"` | no |
-| <a name="input_subnet_name"></a> [subnet\_name](#input\_subnet\_name) | n/a | `string` | n/a | yes |
-| <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | n/a | `string` | n/a | yes |
+| <a name="input_allowed_application_ports"></a> [allowed\_application\_ports](#input\_allowed\_application\_ports) | Lista de portas permitidas para a aplicação. | `list(string)` | <pre>[<br/>  "8069",<br/>  "8071",<br/>  "8072"<br/>]</pre> | no |
+| <a name="input_create_default_route"></a> [create\_default\_route](#input\_create\_default\_route) | Se verdadeiro, cria uma rota padrão para a VPC. | `bool` | `true` | no |
+| <a name="input_delete_default_routes"></a> [delete\_default\_routes](#input\_delete\_default\_routes) | Se verdadeiro, remove as rotas padrão da VPC. | `bool` | `false` | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | ID do projeto GCP onde os recursos serão criados. | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | Região onde os recursos serão criados. | `string` | `"southamerica-east1"` | no |
+| <a name="input_subnet_cidr"></a> [subnet\_cidr](#input\_subnet\_cidr) | CIDR da sub-rede onde os recursos serão criados. | `string` | `"10.0.0.0/24"` | no |
+| <a name="input_subnet_name"></a> [subnet\_name](#input\_subnet\_name) | Nome da sub-rede onde os recursos serão criados. | `string` | n/a | yes |
+| <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Nome da VPC onde os recursos serão criados. | `string` | n/a | yes |
 
 ## Outputs
 
