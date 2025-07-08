@@ -1,11 +1,14 @@
-# terragrunt.hcl para o ambiente prod, componente load_balancer.
 include {
   path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
+locals {
+  config_vars = read_terragrunt_config(find_in_parent_folders("secrets.hcl"))
+}
+
 terraform {
-  source = "../../modules/load_balancer"
+  source = "${get_repo_root()}/modules/load_balancer"
 }
 
 dependency "vpc" {
@@ -35,22 +38,8 @@ dependency "compute_engine" {
   }
 }
 
-# Exemplo de inputs (ajuste conforme sua necessidade):
-# inputs = {
-
-#   mig_self_link          = dependency.compute_engine.outputs.mig_self_link
-#   health_check_self_link = dependency.health_checks.outputs.health_check_self_link
-#   ssl_domains            = ["galileostdio.com"]
-#   enable_cdn             = false
-
-
-# }
 
 inputs = {
-  project_id = include.locals.project_id
-  region     = include.locals.region
-
-  # VPC/subnet (se o módulo usar)
   vpc_name         = dependency.vpc.outputs.vpc_name
   vpc_self_link    = dependency.vpc.outputs.vpc_self_link
   subnet_self_link = dependency.vpc.outputs.subnet_self_link
