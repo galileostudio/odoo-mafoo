@@ -15,6 +15,7 @@ dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
     vpc_output = "mock-vpc-output"
+    subnet_self_link    = "https://mock-vpc-self-link/projects/team:myproject/global/networks/backend-network"
   }
 }
 

@@ -14,7 +14,11 @@ terraform {
 
 dependency "vpc" {
   config_path = "../vpc"
+  mock_outputs = {
+    vpc_self_link    = "https://mock-vpc-self-link/projects/team:myproject/global/networks/backend-network"
+  }
 }
+
 
 inputs = {
   vpc_self_link = dependency.vpc.outputs.vpc_self_link
