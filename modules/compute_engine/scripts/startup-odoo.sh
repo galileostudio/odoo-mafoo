@@ -29,9 +29,6 @@ ensure_dir() {
     dir="$1"
     owner="$2"
     perm="755"
-    if [ -n "$3" ]; then
-        perm="$3"
-    fi
     mkdir -p "$dir"
     chown "$owner" "$dir"
     chmod "$perm" "$dir"
@@ -152,6 +149,8 @@ apt-get update && apt-get install -y odoo
 ensure_dir "/opt/odoo17/addons" "odoo:odoo"
 ensure_dir "/var/lib/odoo" "odoo:odoo"
 ensure_dir "/var/log/odoo" "odoo:odoo"
+systemctl daemon-reload
+systemctl enable --now odoo.service
 cat > /etc/odoo/odoo.conf <<EOF
 [options]
 addons_path = /mnt/odoo-plugins,/opt/odoo17/addons
@@ -167,8 +166,9 @@ proxy_mode  = False
 without_demo = True
 xmlrpc_interface = 0.0.0.0
 xmlrpc_port      = 8069
+limit_time_real = 1200
+limit_time_cpu = 1200
 EOF
 chown odoo:odoo /etc/odoo/odoo.conf
 chmod 600 /etc/odoo/odoo.conf
-systemctl daemon-reload
-systemctl enable --now odoo.service
+systemctl restart odoo.service
