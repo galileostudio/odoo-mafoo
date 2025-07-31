@@ -3,13 +3,16 @@ include {
   expose = true
 }
 
-terraform {
-  source = "../../modules/cloud_storage"
+locals {
+  config_vars = read_terragrunt_config(find_in_parent_folders("secrets.hcl"))
 }
 
+terraform {
+  source = "${get_repo_root()}/modules/cloud_storage"
+}
 
 inputs = {
-  region      = include.locals.region
-  project_id  = include.locals.project_id
+  region      = local.config_vars.locals.region
+  project_id  = local.config_vars.locals.project_id
   bucket_name = "paycon_plugins"
 }

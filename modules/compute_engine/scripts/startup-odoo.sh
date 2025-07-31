@@ -37,6 +37,7 @@ ensure_dir() {
 export DEBIAN_FRONTEND=noninteractive
 trap 'handle_error $LINENO' ERR
 
+
 log "##################"
 log "Otimizando o sistema operacional..."
 add_unique_line "vm.dirty_ratio=6" /etc/sysctl.conf
@@ -126,13 +127,14 @@ fi
 
 log "Habilitando e montando volumes..."
 systemctl daemon-reload
-#systemctl enable --now mnt-odooplugins.mount
-#systemctl enable --now mnt-odooattachments.mount
+systemctl enable --now mnt-odooplugins.mount
+systemctl enable --now mnt-odooattachments.mount
 
 log "Instalando dependências do Odoo..."
 apt-get install -y git python3-pip python3-dev python3-venv \
 build-essential libxslt-dev libzip-dev libldap2-dev libsasl2-dev libssl-dev \
 libpq-dev libjpeg-dev nodejs npm fontconfig xfonts-75dpi xfonts-base wkhtmltopdf
+pip3 install sqlparse pandas validate_docbr simplejson --break-system-packages
 ln -sf /usr/bin/nodejs /usr/bin/node || true
 if ! npm install -g less less-plugin-clean-css 2> /tmp/npm_less_error.log; then
     log "npm install failed: $(cat /tmp/npm_less_error.log)"

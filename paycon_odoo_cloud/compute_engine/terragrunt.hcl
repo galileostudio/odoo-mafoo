@@ -14,18 +14,18 @@ terraform {
 dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
-    vpc_output = "mock-vpc-output"
-    subnet_self_link    = "https://mock-vpc-self-link/projects/team:myproject/global/networks/backend-network"
+    vpc_output       = "mock-vpc-output"
+    subnet_self_link = "https://mock-vpc-self-link/projects/team:myproject/global/networks/backend-network"
   }
 }
 
-#dependency "cloud_storage_plugins" {
-#  config_path = "../cloud_storage_plugins"
-#  mock_outputs = {
-#    bucket_name = "mock-plugins-bucket"
-#  }
-#}
-#
+dependency "cloud_storage_plugins" {
+  config_path = "../cloud_storage_plugins"
+  mock_outputs = {
+    bucket_name = "mock-plugins-bucket"
+  }
+}
+
 dependency "paycon_attachments" {
   config_path = "../cloud_storage_attachments"
   mock_outputs = {
@@ -37,6 +37,7 @@ dependency "cloud_sql" {
   config_path = "../cloud_sql"
 
   mock_outputs = {
+    db_user     = "mock-cloud_sql-user"
     db_name     = "mock-cloud_sql-output"
     db_password = "mock-cloud_sql-password"
     db_username = "mock-cloud_sql-username"
@@ -55,13 +56,11 @@ dependency "health_checks" {
 
 
 inputs = {
-  attachments_bucket_name = dependency.paycon_attachments.outputs.bucket_name
   cost_center             = "all"
   db_host                 = dependency.cloud_sql.outputs.private_ip
   db_password             = dependency.cloud_sql.outputs.db_password
   db_username             = dependency.cloud_sql.outputs.db_username
   db_name                 = dependency.cloud_sql.outputs.db_name
-  plugins_bucket_name     = 123
   additional_addons_paths = ["/tmp", "/tmp/plugins"]
 
   # Configurações de rede
@@ -77,8 +76,8 @@ inputs = {
   service_account_email = local.config_vars.locals.service_account_email
 
   # Buckets GCS
-  #plugins_bucket_name     = dependency.cloud_storage_plugins.outputs.bucket_name
-  #attachments_bucket_name = dependency.paycon_attachments.outputs.bucket_name
+  plugins_bucket_name     = dependency.cloud_storage_plugins.outputs.bucket_name
+  attachments_bucket_name = dependency.paycon_attachments.outputs.bucket_name
 
   # Configuração adicional para produção
   machine_type           = "e2-standard-2"
