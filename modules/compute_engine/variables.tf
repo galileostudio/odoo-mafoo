@@ -28,23 +28,33 @@ variable "disk_type" {
 }
 
 variable "initial_size" {
-  type = number
+  description = "value for initial size of the instance group manager"
+  default     = 2
+  type        = number
 }
 
 variable "min_size" {
-  type = number
+  description = "value for minimum size of the instance group manager"
+  default     = 2
+  type        = number
 }
 
 variable "max_size" {
-  type = number
+  description = "value for maximum size of the instance group manager"
+  default     = 6
+  type        = number
 }
 
 variable "cpu_target" {
-  type = number
+  description = "Target CPU utilization for autoscaling"
+  default     = 0.75
+  type        = number
 }
 
 variable "disk_size_gb" {
-  type = number
+  description = "Disk size in GB for the instance"
+  default     = 25
+  type        = number
 }
 
 variable "attachments_bucket_name" {

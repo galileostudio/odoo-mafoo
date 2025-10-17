@@ -13,10 +13,6 @@ resource "random_password" "this" {
   special = true
 }
 
-resource "google_compute_address" "static" {
-  name = "ipv4-address"
-}
-
 data "google_compute_image" "this" {
   project = var.compute_image_project
   family  = var.compute_image_family
@@ -33,8 +29,16 @@ resource "google_compute_instance_template" "this" {
   machine_type = var.machine_type
   region       = var.region
 
+  scheduling {
+    preemptible                 = true
+    automatic_restart           = false
+    on_host_maintenance         = "TERMINATE"
+    provisioning_model          = "SPOT"
+    instance_termination_action = "STOP"
+  }
   disk {
-    source_image = data.google_compute_image.this.self_link
+    # source_image = data.google_compute_image.this.self_link
+    source_image = "projects/${var.project_id}/global/images/family/odoo-production"
     disk_type    = var.disk_type
     disk_size_gb = var.disk_size_gb
     auto_delete  = true
@@ -43,9 +47,9 @@ resource "google_compute_instance_template" "this" {
 
   network_interface {
     subnetwork = var.subnet_self_link
-    access_config {
-      nat_ip = google_compute_address.static.address
-    }
+    #access_config {
+    #  nat_ip = google_compute_address.static.address
+    #}
   }
   metadata = {
     startup-script = templatefile("${path.module}/scripts/startup-odoo.sh", {
@@ -89,9 +93,9 @@ resource "google_compute_instance_template" "this" {
 }
 
 resource "google_compute_region_instance_group_manager" "this" {
-  name               = var.compute_group_manager #"odoo-prod-mig"
+  name               = var.compute_group_manager
   region             = var.region
-  base_instance_name = var.base_instance_name #"odoo-prod-instance"
+  base_instance_name = var.base_instance_name
   target_size        = var.initial_size
 
   version {
@@ -103,7 +107,7 @@ resource "google_compute_region_instance_group_manager" "this" {
 
   named_port {
     name = "http"
-    port = var.compute_named_port #8069
+    port = var.compute_named_port
   }
   #auto_healing_policies {
   #  health_check      = var.health_check_self_link
@@ -120,14 +124,14 @@ resource "google_compute_region_autoscaler" "this" {
   autoscaling_policy {
     min_replicas    = var.min_size
     max_replicas    = var.max_size
-    cooldown_period = 300
+    cooldown_period = 180
 
     cpu_utilization {
       target = var.cpu_target
     }
     scale_in_control {
       max_scaled_in_replicas {
-        fixed = 1
+        fixed = 2
       }
       time_window_sec = 600
     }
