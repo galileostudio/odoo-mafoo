@@ -18,7 +18,6 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [google_compute_address.static](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
 | [google_compute_instance_template.this](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_template) | resource |
 | [google_compute_region_autoscaler.this](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_autoscaler) | resource |
 | [google_compute_region_instance_group_manager.this](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_instance_group_manager) | resource |
@@ -46,19 +45,19 @@ No modules.
 | <a name="input_compute_name_prefix"></a> [compute\_name\_prefix](#input\_compute\_name\_prefix) | Prefixo para o nome do template de instância. | `string` | `"odoo-prod-template-"` | no |
 | <a name="input_compute_named_port"></a> [compute\_named\_port](#input\_compute\_named\_port) | Porta nomeada para o grupo de instâncias. | `number` | `8069` | no |
 | <a name="input_cost_center"></a> [cost\_center](#input\_cost\_center) | n/a | `string` | n/a | yes |
-| <a name="input_cpu_target"></a> [cpu\_target](#input\_cpu\_target) | n/a | `number` | n/a | yes |
+| <a name="input_cpu_target"></a> [cpu\_target](#input\_cpu\_target) | Target CPU utilization for autoscaling | `number` | `0.75` | no |
 | <a name="input_db_host"></a> [db\_host](#input\_db\_host) | IP privado do Cloud SQL | `string` | n/a | yes |
 | <a name="input_db_password"></a> [db\_password](#input\_db\_password) | Database password for Odoo. | `string` | n/a | yes |
 | <a name="input_db_username"></a> [db\_username](#input\_db\_username) | Database username for Odoo. | `string` | n/a | yes |
-| <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | n/a | `number` | n/a | yes |
+| <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | Disk size in GB for the instance | `number` | `25` | no |
 | <a name="input_disk_type"></a> [disk\_type](#input\_disk\_type) | n/a | `string` | n/a | yes |
 | <a name="input_enviroment"></a> [enviroment](#input\_enviroment) | Environment name (e.g., prod, dev, staging). | `string` | n/a | yes |
-| <a name="input_initial_size"></a> [initial\_size](#input\_initial\_size) | n/a | `number` | n/a | yes |
+| <a name="input_initial_size"></a> [initial\_size](#input\_initial\_size) | value for initial size of the instance group manager | `number` | `2` | no |
 | <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Nível de log para a aplicação. | `string` | `"info"` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | n/a | `string` | n/a | yes |
 | <a name="input_max_cron_threads"></a> [max\_cron\_threads](#input\_max\_cron\_threads) | Número máximo de threads cron para aplicação. | `number` | `2` | no |
-| <a name="input_max_size"></a> [max\_size](#input\_max\_size) | n/a | `number` | n/a | yes |
-| <a name="input_min_size"></a> [min\_size](#input\_min\_size) | n/a | `number` | n/a | yes |
+| <a name="input_max_size"></a> [max\_size](#input\_max\_size) | value for maximum size of the instance group manager | `number` | `6` | no |
+| <a name="input_min_size"></a> [min\_size](#input\_min\_size) | value for minimum size of the instance group manager | `number` | `2` | no |
 | <a name="input_odoo_version"></a> [odoo\_version](#input\_odoo\_version) | Versão do Odoo a ser instalada. | `string` | `"16.0"` | no |
 | <a name="input_plugins_bucket_name"></a> [plugins\_bucket\_name](#input\_plugins\_bucket\_name) | Nome do bucket para plugins | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
