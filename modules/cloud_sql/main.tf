@@ -15,14 +15,15 @@ resource "google_sql_database_instance" "this" {
       ipv4_enabled    = false
       private_network = var.vpc_self_link
     }
+    edition = "ENTERPRISE_PLUS"
 
     # Exemplo de HA
-    availability_type = "REGIONAL"
+    availability_type = "ZONAL"
 
     backup_configuration {
       enabled                        = true
       start_time                     = "03:00"
-      point_in_time_recovery_enabled = true
+      point_in_time_recovery_enabled = false
     }
   }
 

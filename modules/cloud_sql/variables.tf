@@ -16,7 +16,7 @@ variable "instance_name" {
 
 variable "tier" {
   type        = string
-  default     = "db-f1-micro"
+  default     = "db-perf-optimized-N-2"
   description = "Tipo de máquina para a instância do Cloud SQL."
 }
 
@@ -42,7 +42,7 @@ variable "db_password" {
 
 variable "database_version" {
   type        = string
-  default     = "POSTGRES_14"
+  default     = "POSTGRES_16"
   description = "Versão do banco de dados a ser usado na instância do Cloud SQL."
 }
 
