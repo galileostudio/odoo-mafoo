@@ -7,7 +7,7 @@ resource "google_storage_bucket" "storage_bucket" {
   project       = var.project_id
   location      = var.region
   force_destroy = false
-  
+
   versioning {
     enabled = true
   }
