@@ -67,9 +67,9 @@ inputs = {
   subnet_self_link = dependency.vpc.outputs.subnet_self_link
 
   # Configurações de auto-scaling
-  initial_size = 1
-  min_size     = 1
-  max_size     = 4
+  initial_size = 2
+  min_size     = 2
+  max_size     = 6
   cpu_target   = 0.75
 
   # Service account
