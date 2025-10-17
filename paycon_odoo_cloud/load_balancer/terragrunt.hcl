@@ -51,8 +51,12 @@ inputs = {
   # Health check
   health_check_self_link = dependency.health_checks.outputs.health_check_self_link
 
-  # SSL
-  ssl_domains = ["odoo.galileostdio.com"]
+  # SSL Configuration
+  # ssl_domains = ["paycon.com.br"]
+  
+  # Opção 2: Usar certificado SSL já existente no GCP
+  existing_ssl_certificate_name = "paycon-com-br"
+  
   enable_cdn  = false
 }
 

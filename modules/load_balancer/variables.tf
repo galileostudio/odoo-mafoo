@@ -31,8 +31,14 @@ variable "enable_cdn" {
 
 variable "ssl_domains" {
   type        = list(string)
-  default     = ["exemplo.com"]
-  description = "Lista de domínios para o certificado SSL"
+  description = "Lista de domínios para o certificado SSL (usado apenas se existing_ssl_certificate_name não for fornecido)"
+  default     = []
+}
+
+variable "existing_ssl_certificate_name" {
+  type        = string
+  description = "Nome de um certificado SSL já existente no GCP. Se fornecido, este certificado será usado ao invés de criar um novo"
+  default     = null
 }
 
 variable "health_check_self_link" {

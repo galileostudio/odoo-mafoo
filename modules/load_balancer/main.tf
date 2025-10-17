@@ -1,6 +1,27 @@
 terraform {
   backend "gcs" {}
 }
+locals {
+  validate_ssl_config = (
+    var.existing_ssl_certificate_name == null && length(var.ssl_domains) == 0
+    ? tobool("ERRO: Você deve fornecer 'existing_ssl_certificate_name' OU 'ssl_domains'")
+    : true
+  )
+
+  validate_ssl_exclusivity = (
+    var.existing_ssl_certificate_name != null && length(var.ssl_domains) > 0
+    ? tobool("AVISO: 'ssl_domains' será ignorado quando 'existing_ssl_certificate_name' for fornecido")
+    : true
+  )
+}
+data "google_compute_ssl_certificate" "existing" {
+  count   = var.existing_ssl_certificate_name != null ? 1 : 0
+  name    = var.existing_ssl_certificate_name
+  project = var.project_id
+}
+locals {
+  ssl_certificate_self_link = var.existing_ssl_certificate_name != null ? data.google_compute_ssl_certificate.existing[0].self_link : google_compute_managed_ssl_certificate.this[0].self_link
+}
 
 resource "google_compute_backend_service" "this" {
   name                            = "${var.application_name}-backend-service"
@@ -8,13 +29,20 @@ resource "google_compute_backend_service" "this" {
   protocol                        = "HTTP"
   health_checks                   = [var.health_check_self_link]
   port_name                       = "http"
-  timeout_sec                     = 30
+  timeout_sec                     = 10
   connection_draining_timeout_sec = 10
   enable_cdn                      = var.enable_cdn
   session_affinity                = "GENERATED_COOKIE"
 
   backend {
-    group = var.instance_group_self_link
+    group           = var.instance_group_self_link
+    balancing_mode  = "UTILIZATION"
+    capacity_scaler = 1.0
+  }
+
+  log_config {
+    enable      = true
+    sample_rate = 1.0
   }
 }
 
@@ -26,20 +54,28 @@ resource "google_compute_global_address" "lb_ip" {
 resource "google_compute_url_map" "url_map" {
   name            = "${var.application_name}-url-map"
   default_service = google_compute_backend_service.this.self_link
+  # default_url_redirect {
+  #  https_redirect = true
+  #  strip_query    = false
+  #}
 }
 
 resource "google_compute_target_https_proxy" "this" {
   name             = "${var.application_name}-https-proxy"
   url_map          = google_compute_url_map.url_map.self_link
-  ssl_certificates = [google_compute_managed_ssl_certificate.this.self_link]
+  ssl_certificates = [local.ssl_certificate_self_link]
+  quic_override    = "ENABLE"
 }
 
+# Recurso para criar certificado gerenciado (apenas se não houver certificado existente)
 resource "google_compute_managed_ssl_certificate" "this" {
-  name = "${var.application_name}-managed-ssl"
+  count   = var.existing_ssl_certificate_name != null ? 0 : 1
+  name    = "${var.application_name}-managed-ssl"
+  project = var.project_id
+
   managed {
     domains = var.ssl_domains
   }
-  project = var.project_id
 
   lifecycle {
     create_before_destroy = true
