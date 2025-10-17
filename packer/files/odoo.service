@@ -1,0 +1,16 @@
+[Unit]
+Description=Odoo
+Documentation=http://www.odoo.com
+After=postgresql.service
+
+[Service]
+Type=simple
+User=odoo
+ExecStart=/home/odoo/venv/bin/python /home/odoo/odoo/odoo-bin -c /etc/odoo.conf
+KillMode=mixed
+KillSignal=SIGINT
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
